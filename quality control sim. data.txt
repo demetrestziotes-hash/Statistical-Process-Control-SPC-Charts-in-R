@@ -1,0 +1,73 @@
+install.packages("qcc")
+library(qcc)
+
+set.seed(096)
+
+# Phase 1: We have 200 data with 20 groups of 10 obs.
+data <-rnorm(200,100,1)
+data.mat <-matrix(data,ncol=10,byrow=TRUE)
+qcc(data.mat,type="xbar",title="X-Bar Chart at Phase 1")
+# we see there are no obs. beyond the CL’s so we proceed to
+# phase 2
+
+# Phase 2: We have 200 data with 20 groups of 10 obs. but
+# with a shift in the mean
+data1 <-rnorm(200,100.5,1)
+data.mat2 <-matrix(data1,ncol=10,byrow=TRUE)
+
+# Create X-bar chart with phase 1 and 2
+qcc(data.mat,labels=1:20,type="xbar",
+newdata=data.mat2,newlabels=21:40,
+title="X-Bar Chart of Phase 1 and 2",add.stats=FALSE)
+
+# Create S-Chart with phase 1 and 2
+qcc(data.mat,labels=1:20,type="S",
+newdata=data.mat2,newlabels=21:40,
+title="X-Bar Chart of Phase 1 and 2")
+
+# Create CUSUM with phase 1 and 2
+cusum(data.mat,labels=1:20,newdata=data.mat2,newlabels=21:40,
+title="CUSUM Chart of Phase 1 and 2",add.stats=FALSE)
+
+# Create EWMA with phase 1 and 2
+ewma(data.mat,labels=1:20,newdata=data.mat2,newlabels=21:40,
+title="EWMA Chart of Phase 1 and 2",add.stats=FALSE)
+
+# Now the products (chocolates) are passing from a check to
+# count the number of defectives, the percentage, the number
+# of all defections (like a torn wrap)
+
+# For the percentage of defectives (p-chart)
+# We assume the number of obs. is not the same
+
+# Phase 1
+# We have 20 samples from 80-100 obs.
+p1 <-sample(80:100,20,replace=TRUE)
+
+# We count the defected at each sample
+p1.per <-rbinom(20,size=p1,prob=0.05) # 5% is defected
+qcc(p1.per,sizes=p1,type="p",center=0.05) # in-control proceed in phase 2
+
+
+# Phase 2
+# Now the % goes to 10%
+p2 <-sample(80:100,20,replace=TRUE)
+p2.per <-rbinom(20,size=p2,prob=0.1)
+qcc(p1.per,sizes=p1,labels=1:20,type="p",newdata=p2.per,
+newsizes=p2,newlabels=21:40,center=0.05,
+title="P-Chart for a shift in 10% in Phase 2")
+
+# For the number of defectives (np-chart)
+# We assume the sample size is the same
+
+# Phase 1
+# We have 20 samples of size 90 and with prob 0.05
+np1 <-rbinom(20,100,0.05)
+qcc(np1,sizes=100,type="np",center=5) # in-control go to phase 2
+
+# Phase 2
+# Now the % goes to 10%
+np2 <-rbinom(20,100,0.1)
+qcc(np1,sizes=100,labels=1:20,type="np",newdata=np2,
+newlabels=21:40,newsizes=100,center=5,
+title="NP-Chart to 10
